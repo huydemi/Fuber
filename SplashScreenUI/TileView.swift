@@ -40,6 +40,7 @@ class TileView: UIView {
     super.init(frame: frame)
 //    layer.contents = TileView.chimesSplashImage.CGImage
     layer.shouldRasterize = true
+    layer.borderWidth = 2.0
   }
   
   required init?(coder aDecoder: NSCoder) {
