@@ -48,9 +48,9 @@ open class AnimatedULogoView: UIView {
     squareLayer = generateSquareLayer()
     maskLayer = generateMaskLayer()
     
-//    layer.mask = maskLayer
+    layer.mask = maskLayer
     layer.addSublayer(circleLayer)
-//    layer.addSublayer(lineLayer)
+    layer.addSublayer(lineLayer)
     layer.addSublayer(squareLayer)
   }
   
@@ -58,7 +58,7 @@ open class AnimatedULogoView: UIView {
     beginTime = CACurrentMediaTime()
     layer.anchorPoint = CGPoint.zero
     
-//    animateMaskLayer()
+    animateMaskLayer()
     animateCircleLayer()
     animateLineLayer()
     animateSquareLayer()
@@ -119,6 +119,32 @@ extension AnimatedULogoView {
 extension AnimatedULogoView {
   
   fileprivate func animateMaskLayer() {
+    // bounds
+    let boundsAnimation = CABasicAnimation(keyPath: "bounds")
+    boundsAnimation.fromValue = NSValue(cgRect: CGRect(x: 0.0, y: 0.0, width: radius * 2.0, height: radius * 2))
+    boundsAnimation.toValue = NSValue(cgRect: CGRect(x: 0.0, y: 0.0, width: 2.0/3.0 * squareLayerLength, height: 2.0/3.0 * squareLayerLength))
+    boundsAnimation.duration = kAnimationDurationDelay
+    boundsAnimation.beginTime = kAnimationDuration - kAnimationDurationDelay
+    boundsAnimation.timingFunction = circleLayerTimingFunction
+    
+    // cornerRadius
+    let cornerRadiusAnimation = CABasicAnimation(keyPath: "cornerRadius")
+    cornerRadiusAnimation.beginTime = kAnimationDuration - kAnimationDurationDelay
+    cornerRadiusAnimation.duration = kAnimationDurationDelay
+    cornerRadiusAnimation.fromValue = radius
+    cornerRadiusAnimation.toValue = 2
+    cornerRadiusAnimation.timingFunction = circleLayerTimingFunction
+    
+    // Group
+    let groupAnimation = CAAnimationGroup()
+    groupAnimation.isRemovedOnCompletion = false
+    groupAnimation.fillMode = kCAFillModeBoth
+    groupAnimation.beginTime = beginTime
+    groupAnimation.repeatCount = Float.infinity
+    groupAnimation.duration = kAnimationDuration
+    groupAnimation.animations = [boundsAnimation, cornerRadiusAnimation]
+    groupAnimation.timeOffset = startTimeOffset
+    maskLayer.add(groupAnimation, forKey: "looping")
   }
   
   fileprivate func animateCircleLayer() {
