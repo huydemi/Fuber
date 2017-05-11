@@ -122,6 +122,32 @@ extension AnimatedULogoView {
   }
   
   fileprivate func animateCircleLayer() {
+    // strokeEnd
+    let strokeEndAnimation = CAKeyframeAnimation(keyPath: "strokeEnd")
+    strokeEndAnimation.timingFunction = strokeEndTimingFunction
+    strokeEndAnimation.duration = kAnimationDuration - kAnimationDurationDelay
+    strokeEndAnimation.values = [0.0, 1.0]
+    strokeEndAnimation.keyTimes = [0.0, 1.0]
+    
+    // transform
+    let transformAnimation = CABasicAnimation(keyPath: "transform")
+    transformAnimation.timingFunction = strokeEndTimingFunction
+    transformAnimation.duration = kAnimationDuration - kAnimationDurationDelay
+    
+    var startingTransform = CATransform3DMakeRotation(-CGFloat(M_PI_4), 0, 0, 1)
+    startingTransform = CATransform3DScale(startingTransform, 0.25, 0.25, 1)
+    transformAnimation.fromValue = NSValue(caTransform3D: startingTransform)
+    transformAnimation.toValue = NSValue(caTransform3D: CATransform3DIdentity)
+    
+    // Group
+    let groupAnimation = CAAnimationGroup()
+    groupAnimation.animations = [strokeEndAnimation, transformAnimation]
+    groupAnimation.repeatCount = Float.infinity
+    groupAnimation.duration = kAnimationDuration
+    groupAnimation.beginTime = beginTime
+    groupAnimation.timeOffset = startTimeOffset
+    
+    circleLayer.add(groupAnimation, forKey: "looping")
   }
   
   fileprivate func animateLineLayer() {
