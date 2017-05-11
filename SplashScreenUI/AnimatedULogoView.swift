@@ -50,8 +50,8 @@ open class AnimatedULogoView: UIView {
     
 //    layer.mask = maskLayer
     layer.addSublayer(circleLayer)
-    layer.addSublayer(lineLayer)
-//    layer.addSublayer(squareLayer)
+//    layer.addSublayer(lineLayer)
+    layer.addSublayer(squareLayer)
   }
   
   open func startAnimating() {
@@ -59,9 +59,9 @@ open class AnimatedULogoView: UIView {
     layer.anchorPoint = CGPoint.zero
     
 //    animateMaskLayer()
-//    animateCircleLayer()
+    animateCircleLayer()
     animateLineLayer()
-//    animateSquareLayer()
+    animateSquareLayer()
   }
   
   required public init?(coder aDecoder: NSCoder) {
@@ -183,5 +183,34 @@ extension AnimatedULogoView {
   }
   
   fileprivate func animateSquareLayer() {
+    // bounds
+    let b1 = NSValue(cgRect: CGRect(x: 0.0, y: 0.0, width: 2.0/3.0 * squareLayerLength, height: 2.0/3.0  * squareLayerLength))
+    let b2 = NSValue(cgRect: CGRect(x: 0.0, y: 0.0, width: squareLayerLength, height: squareLayerLength))
+    let b3 = NSValue(cgRect: CGRect.zero)
+    
+    let boundsAnimation = CAKeyframeAnimation(keyPath: "bounds")
+    boundsAnimation.values = [b1, b2, b3]
+    boundsAnimation.timingFunctions = [fadeInSquareTimingFunction, squareLayerTimingFunction]
+    boundsAnimation.duration = kAnimationDuration
+    boundsAnimation.keyTimes = [0, 1.0-(kAnimationDurationDelay/kAnimationDuration) as NSNumber, 1.0]
+    
+    // backgroundColor
+    let backgroundColorAnimation = CABasicAnimation(keyPath: "backgroundColor")
+    backgroundColorAnimation.fromValue = UIColor.white.cgColor
+    backgroundColorAnimation.toValue = UIColor.fuberBlue().cgColor
+    backgroundColorAnimation.timingFunction = squareLayerTimingFunction
+    backgroundColorAnimation.fillMode = kCAFillModeBoth
+    backgroundColorAnimation.beginTime = kAnimationDurationDelay * 2.0 / kAnimationDuration
+    backgroundColorAnimation.duration = kAnimationDuration / (kAnimationDuration - kAnimationDurationDelay)
+    
+    // Group
+    let groupAnimation = CAAnimationGroup()
+    groupAnimation.animations = [boundsAnimation, backgroundColorAnimation]
+    groupAnimation.repeatCount = Float.infinity
+    groupAnimation.duration = kAnimationDuration
+    groupAnimation.isRemovedOnCompletion = false
+    groupAnimation.beginTime = beginTime
+    groupAnimation.timeOffset = startTimeOffset
+    squareLayer.add(groupAnimation, forKey: "looping")
   }
 }
